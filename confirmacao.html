@@ -44,20 +44,14 @@
     const SUPABASE_KEY = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"; 
 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      global: {
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`
-        }
-      }
+      global: { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
     });
 
     async function carregarListaPublica() {
-      // Busca apenas quem ainda está como respondido = false
       const { data: lista, error } = await _supabase
         .from('convidados')
         .select('*')
-        .eq('respondido', false)
+        .or('respondido.eq.FALSE,respondido.is.null,respondido.eq.false')
         .order('nome', { ascending: true });
 
       if (error) {
@@ -91,12 +85,11 @@
         return;
       }
 
-      // Atualiza exatamente as colunas 'resposta' e 'respondido'
       const { error } = await _supabase
         .from('convidados')
         .update({ 
           resposta: valorPresenca,
-          respondido: true
+          respondido: 'TRUE'
         })
         .eq('id', idConvidado);
 
