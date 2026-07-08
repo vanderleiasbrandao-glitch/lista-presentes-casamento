@@ -1,190 +1,112 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Presentes de Casamento</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Arial, Helvetica, sans-serif;
-        }
-        body{
-            background:#f5f5f5;
-        }
-        header{
-            background:#d46a92;
-            color:white;
-            text-align:center;
-            padding:30px;
-        }
-        h1{
-            font-size:36px;
-        }
-        .container{
-            max-width:1200px;
-            margin:auto;
-            padding:40px;
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-            gap:25px;
-        }
-        .card{
-            background:white;
-            border-radius:12px;
-            overflow:hidden;
-            box-shadow:0 2px 10px rgba(0,0,0,.15);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .foto{
-            width:100%;
-            height:220px;
-            background:#ececec;
-            background-size: cover;
-            background-position: center;
-        }
-        .conteudo{
-            padding:20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .titulo{
-            font-size:22px;
-            margin-bottom:10px;
-            font-weight: bold;
-        }
-        .descricao{
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        .valor{
-            color:#d46a92;
-            font-size:22px;
-            font-weight:bold;
-            margin-bottom: 10px;
-        }
-        .status{
-            margin:10px 0 20px 0;
-            font-weight:bold;
-        }
-        .disponivel { color: green; }
-        .reservado { color: #888; }
-        button{
-            width:100%;
-            padding:15px;
-            border:none;
-            border-radius:8px;
-            background:#d46a92;
-            color:white;
-            font-size:16px;
-            cursor:pointer;
-            transition: background 0.2s;
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Presentes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; color: #333; }
+    header { background: #d46a92; color: white; padding: 40px 20px; text-align: center; border-radius: 10px; margin-bottom: 30px; }
+    h1 { margin: 0; font-size: 28px; }
+    .grid-presentes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+    .card-presente { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-presente img { max-width: 100%; height: 180px; object-fit: contain; border-radius: 5px; margin-bottom: 15px; }
+    .nome-presente { font-size: 18px; font-weight: bold; margin: 10px 0; }
+    .descricao-presente { font-size: 14px; color: #666; margin-bottom: 10px; height: 40px; overflow: hidden; }
+    .valor-presente { font-size: 20px; color: #d46a92; font-weight: bold; margin-bottom: 15px; }
+    .btn-reservar { background: #d46a92; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    .btn-reservar:hover { background: #b55376; }
+    .status-reservado { color: #777; font-weight: bold; padding: 10px; background: #eee; border-radius: 5px; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  </style>
 </head>
 <body>
 
-<header>
-    <h1>🎁 Lista de Presentes de Casamento Angelica e Lucas</h1>
-    <p>Escolha um presente com carinho para os noivos.</p>
-</header>
+  <header>
+    <h1>Lista de Presentes dos Noivos</h1>
+    <p>Escolha um presente para demonstrar todo o seu carinho!</p>
+  </header>
 
-<div class="container" id="lista-presentes">
-    <p style="text-align: center; grid-column: 1/-1;">Carregando presentes...</p>
-</div>
+  <div class="grid-presentes" id="listaProdutos">
+    <!-- Os produtos serão carregados aqui via JavaScript -->
+  </div>
 
-<script>
-    // Configurações do seu banco de dados
+  <script>
     const SUPABASE_URL = "https://jncjiqyakzztfgzldshi.supabase.co";
-    
-    // ⚠️ MUDE APENAS A LINHA ABAIXO: Apague o texto que está entre as aspas e cole a sua CHAVE que salvou no bloco de notas
-    const SUPABASE_KEY = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB";
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"; 
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    });
 
     async function carregarPresentes() {
-        const { data: presentes, error } = await supabaseClient
-            .from('presentes')
-            .select('*')
-            .order('id', { ascending: true });
+      const { data: produtos, error } = await _supabase
+        .from('presentes')
+        .select('*')
+        .order('nome', { ascending: true });
 
-        if (error) {
-            console.error("Erro ao buscar presentes:", error);
-            return;
-        }
+      if (error) {
+        console.error("Erro ao buscar presentes:", error);
+        return;
+      }
 
-        const container = document.getElementById('lista-presentes');
-        container.innerHTML = '';
+      const container = document.getElementById("listaProdutos");
+      container.innerHTML = "";
 
-        presentes.forEach(presente => {
-            const isReservado = presente.reservado === true;
-            
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            card.innerHTML = `
-                <div class="foto" style="background-image: url('${presente.imagem || ''}')"></div>
-                <div class="conteudo">
-                    <div>
-                        <div class="titulo">${presente.nome}</div>
-                        <div class="descricao">${presente.descrição || ''}</div>
-                        <div class="valor">R$ ${Number(presente.valor).toFixed(2).replace('.', ',')}</div>
-                    </div>
-                    <div>
-                        <div class="status ${isReservado ? 'reservado' : 'disponivel'}">
-                            ${isReservado ? `🔴 Reservado por ${presente.reservado_por}` : '🟢 Disponível'}
-                        </div>
-                        <button ${isReservado ? 'disabled' : ''} onclick="reservarPresente(${presente.id}, '${presente.nome}')">
-                            ${isReservado ? 'Já reservado' : 'Escolher presente'}
-                        </button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
+      produtos.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card-presente";
 
-    async function reservarPresente(id, nomePresente) {
-        const nomeConvidado = prompt(`Você escolheu: ${nomePresente}\nPor favor, digite o seu nome para confirmar a reserva:`);
+        // Verifica se o item está reservado de acordo com o seu banco (TRUE ou true)
+        const isReservado = p.reservado === true || p.reservado === 'TRUE';
+
+        let acaoBotao = `<button class="btn-reservar" onclick="reservarItem(${p.id}, '${p.nome}')">🎁 Escolher Presente</button>`;
         
-        if (!nomeConvidado || nomeConvidado.trim() === "") {
-            alert("Reserva cancelada. É necessário informar o seu nome.");
-            return;
+        // PRIVACIDADE MÁXIMA: Se estiver reservado, mostra apenas o aviso, SEM o nome de quem escolheu!
+        if (isReservado) {
+          acaoBotao = `<div class="status-reservado">🔴 Já Escolhido</div>`;
         }
 
-        const { error } = await supabaseClient
-            .from('presentes')
-            .update({ 
-                reservado: true, 
-                reservado_por: nomeConvidado.trim() 
-            })
-            .eq('id', id);
-
-        if (error) {
-            alert("Houve um erro ao reservar o presente. Tente novamente.");
-            console.error(error);
-        } else {
-            alert("Presente reservado com sucesso! Muito obrigado! ❤️");
-            carregarPresentes();
-        }
+        card.innerHTML = `
+          <div>
+            <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
+            <div class="nome-presente">${p.nome}</div>
+            <div class="descricao-presente">${p.descrição || p.descricao || ''}</div>
+            <div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>
+          </div>
+          ${acaoBotao}
+        `;
+        container.appendChild(card);
+      });
     }
 
-    carregarPresentes();
-</script>
+    async function reservarItem(idItem, nomeItem) {
+      const nomeConvidado = prompt(`Você escolheu: ${nomeItem}\n\nPor favor, digite o seu nome para confirmarmos aos noivos quem enviou:`);
+      
+      if (!nomeConvidado || nomeConvidado.trim() === "") {
+        alert("A reserva não foi concluída. É necessário informar o seu nome.");
+        return;
+      }
 
+      // Atualiza o banco nas colunas certas capturadas no print
+      const { error } = await _supabase
+        .from('presentes')
+        .update({
+          reservado: 'TRUE',
+          reservado_por: nomeConvidado.trim()
+        })
+        .eq('id', idItem);
+
+      if (error) {
+        alert("Houve um erro ao reservar o presente. Tente novamente.");
+        console.error(error);
+      } else {
+        alert("Presente escolhido com sucesso! Muito obrigado pelo carinho. ❤️");
+        carregarPresentes();
+      }
+    }
+
+    // Inicializa a lista ao abrir a página
+    carregarPresentes();
+  </script>
 </body>
 </html>
