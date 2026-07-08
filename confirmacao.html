@@ -32,8 +32,8 @@
     </select>
 
     <div class="radio-group">
-      <label><input type="radio" name="presenca" value="confirmado" checked> Sim! Estarei lá com vocês ❤️</label>
-      <label><input type="radio" name="presenca" value="recusado"> Não poderei ir, mas desejo toda a felicidade do mundo ✨</label>
+      <label><input type="radio" name="presenca" value="Sim! Estarei lá com vocês ❤️" checked> Sim! Estarei lá com vocês ❤️</label>
+      <label><input type="radio" name="presenca" value="Não poderei ir"> Não poderei ir, mas desejo toda a felicidade do mundo ✨</label>
     </div>
 
     <button onclick="enviarResposta()">Enviar Resposta</button>
@@ -53,11 +53,11 @@
     });
 
     async function carregarListaPublica() {
-      // Ajustado para 'convidados' em minúsculo
+      // Busca apenas quem ainda está como respondido = false
       const { data: lista, error } = await _supabase
         .from('convidados')
         .select('*')
-        .or('status_confirmacao.is.null,status_confirmacao.eq.""')
+        .eq('respondido', false)
         .order('nome', { ascending: true });
 
       if (error) {
@@ -91,11 +91,12 @@
         return;
       }
 
-      // Ajustado para 'convidados' em minúsculo
+      // Atualiza exatamente as colunas 'resposta' e 'respondido'
       const { error } = await _supabase
         .from('convidados')
         .update({ 
-          status_confirmacao: valorPresenca
+          resposta: valorPresenca,
+          respondido: true
         })
         .eq('id', idConvidado);
 
