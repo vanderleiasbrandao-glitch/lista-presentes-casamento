@@ -45,11 +45,9 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function carregarListaPublica() {
-      // Busca quem tem a coluna 'resposta' vazia (NULL)
       const { data: lista, error } = await _supabase
         .from('Convidados')
         .select('*')
-        .is('resposta', null)
         .order('nome', { ascending: true });
 
       if (error) {
@@ -62,7 +60,7 @@
       select.innerHTML = '<option value="">-- Clique aqui para escolher seu nome --</option>';
 
       if (!lista || lista.length === 0) {
-        select.innerHTML = '<option value="">Todos os convidados já responderam!</option>';
+        select.innerHTML = '<option value="">Nenhum convidado cadastrado!</option>';
         return;
       }
 
@@ -83,7 +81,6 @@
         return;
       }
 
-      // Atualiza as colunas exatamente como estão no seu banco
       const { error } = await _supabase
         .from('Convidados')
         .update({ 
