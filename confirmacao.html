@@ -103,6 +103,7 @@ const {error}=await supabaseClient
 
 if(error){
 alert("Erro ao enviar.");
+alert(error.message);
 console.log(error);
 return;
 }
