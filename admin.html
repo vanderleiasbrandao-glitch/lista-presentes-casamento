@@ -1,118 +1,296 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel do Administrador - Noivos</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; color: #333; }
-    .container { max-width: 900px; margin: 20px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,.1); }
-    h1, h2 { color: #d46a92; text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0 40px 0; }
-    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-    th { background-color: #d46a92; color: white; }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    button { background: #d46a92; color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; display: block; margin: 0 auto; }
-    button:hover { background: #b55376; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel dos Noivos</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f6f6f6;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+h1,h2{
+    color:#d46a92;
+    text-align:center;
+}
+
+button{
+
+    background:#d46a92;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:6px;
+    cursor:pointer;
+    display:block;
+    margin:20px auto;
+
+}
+
+button:hover{
+
+background:#bf5d83;
+
+}
+
+table{
+
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+margin-bottom:40px;
+
+}
+
+th,td{
+
+border:1px solid #ddd;
+padding:10px;
+
+}
+
+th{
+
+background:#d46a92;
+color:white;
+
+}
+
+tr:nth-child(even){
+
+background:#fafafa;
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>Painel de Controle do Casamento</h1>
-    <button onclick="buscarDadosDoBanco()">🔄 Atualizar Listas</button>
-    
-    <h2>Lista de Convidados e Presenças</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Nome do Convidado</th>
-          <th>Presença / Resposta</th>
-        </tr>
-      </thead>
-      <tbody id="tabelaConvidados">
-        <tr><td colspan="2">Carregando dados...</td></tr>
-      </tbody>
-    </table>
+<div class="container">
 
-    <h2>Lista de Presentes Escolhidos</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Presente</th>
-          <th>Quem Escolheu</th>
-        </tr>
-      </thead>
-      <tbody id="tabelaPresentes">
-        <tr><td colspan="2">Carregando dados...</td></tr>
-      </tbody>
-    </table>
-  </div>
+<h1>Painel de Controle do Casamento</h1>
 
-  <script>
-    const URL_BANCO = "https://jncjiqyakzztfgzldshi.supabase.co";
-    const CHAVE_BANCO = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"; 
-    
-    const conexaoSupabase = supabase.createClient(URL_BANCO, CHAVE_BANCO, {
-      global: { headers: { apikey: CHAVE_BANCO, Authorization: `Bearer ${CHAVE_BANCO}` } }
-    });
+<button onclick="carregarTudo()">
+Atualizar Listas
+</button>
 
-    async function buscarDadosDoBanco() {
-      // 1. BUSCAR CONVIDADOS
-      const { data: listaConvidados, error: erroC } = await conexaoSupabase
-        .from('convidados')
-        .select('*')
-        .order('nome', { ascending: true });
+<h2>Confirmação de Presença</h2>
 
-      const corpoTabelaC = document.getElementById("tabelaConvidados");
-      corpoTabelaC.innerHTML = "";
+<table>
 
-      if (erroC) {
-        corpoTabelaC.innerHTML = `<tr><td colspan="2">Erro: ${erroC.message}</td></tr>`;
-      } else if (!listaConvidados || listaConvidados.length === 0) {
-        corpoTabelaC.innerHTML = "<tr><td colspan="2">Nenhum convidado cadastrado.</td></tr>";
-      } else {
-        listaConvidados.forEach(item => {
-          let respostaTexto = "❌ Ainda não respondeu";
-          if (item.respondido === true || item.respondido === 'TRUE') {
-            respostaTexto = item.resposta || "✅ Confirmado";
-          }
-          corpoTabelaC.innerHTML += `<tr><td><strong>${item.nome}</strong></td><td>${respostaTexto}</td></tr>`;
-        });
-      }
+<thead>
 
-      // 2. BUSCAR PRESENTES
-      const { data: listaPresentes, error: erroP } = await conexaoSupabase
-        .from('presentes')
-        .select('*')
-        .order('nome', { ascending: true });
+<tr>
 
-      const corpoTabelaP = document.getElementById("tabelaPresentes");
-      corpoTabelaP.innerHTML = "";
+<th>Nome</th>
 
-      if (erroP) {
-        corpoTabelaP.innerHTML = `<tr><td colspan="2">Erro: ${erroP.message}</td></tr>`;
-      } else if (!listaPresentes || listaPresentes.length === 0) {
-        corpoTabelaP.innerHTML = "<tr><td colspan="2">Nenhum presente cadastrado.</td></tr>";
-      } else {
-        let temPresenteReservado = false;
-        
-        listaPresentes.forEach(produto => {
-          if (produto.reservado === true || produto.reservado === 'TRUE' || produto.reservado_por) {
-            temPresenteReservado = true;
-            corpoTabelaP.innerHTML += `<tr><td>${produto.nome}</td><td>🎁 ${produto.reservado_por || 'Nome não informado'}</td></tr>`;
-          }
-        });
+<th>Resposta</th>
 
-        if (!temPresenteReservado) {
-          corpoTabelaP.innerHTML = "<tr><td colspan="2">Nenhum presente reservado ainda.</td></tr>";
-        }
-      }
-    }
+</tr>
 
-    // Executa a busca assim que o painel abre
-    buscarDadosDoBanco();
-  </script>
+</thead>
+
+<tbody id="tbConvidados">
+
+<tr>
+
+<td colspan="2">
+Carregando...
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+<h2>Presentes Reservados</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Presente</th>
+
+<th>Quem escolheu</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tbPresentes">
+
+<tr>
+
+<td colspan="2">
+Carregando...
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+const supabase = window.supabase.createClient(
+
+"https://jncjiqyakzztfgzldshi.supabase.co",
+
+"sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"
+
+);
+
+async function carregarConvidados(){
+
+const tabela=document.getElementById("tbConvidados");
+
+tabela.innerHTML="";
+
+const {data,error}=await supabase
+
+.from("convidados")
+
+.select("*")
+
+.order("nome");
+
+if(error){
+
+tabela.innerHTML=`<tr><td colspan="2">${error.message}</td></tr>`;
+
+console.error(error);
+
+return;
+
+}
+
+if(!data.length){
+
+tabela.innerHTML=`<tr><td colspan="2">Nenhum convidado.</td></tr>`;
+
+return;
+
+}
+
+data.forEach(c=>{
+
+let resposta="Ainda não respondeu";
+
+if(c.respondido){
+
+resposta=c.resposta || "Confirmado";
+
+}
+
+tabela.innerHTML+=`
+
+<tr>
+
+<td>${c.nome}</td>
+
+<td>${resposta}</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+async function carregarPresentes(){
+
+const tabela=document.getElementById("tbPresentes");
+
+tabela.innerHTML="";
+
+const {data,error}=await supabase
+
+.from("presentes")
+
+.select("*")
+
+.order("nome");
+
+if(error){
+
+tabela.innerHTML=`<tr><td colspan="2">${error.message}</td></tr>`;
+
+console.error(error);
+
+return;
+
+}
+
+let encontrou=false;
+
+data.forEach(p=>{
+
+if(p.reservado){
+
+encontrou=true;
+
+tabela.innerHTML+=`
+
+<tr>
+
+<td>${p.nome}</td>
+
+<td>${p.reservado_por || "-"}</td>
+
+</tr>
+
+`;
+
+}
+
+});
+
+if(!encontrou){
+
+tabela.innerHTML=`<tr><td colspan="2">Nenhum presente reservado.</td></tr>`;
+
+}
+
+}
+
+async function carregarTudo(){
+
+await carregarConvidados();
+
+await carregarPresentes();
+
+}
+
+carregarTudo();
+
+</script>
+
 </body>
+
 </html>
