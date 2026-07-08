@@ -21,9 +21,8 @@
 
   <div class="container">
     <h1>Painel de Controle do Casamento</h1>
-    <button onclick="carregarDadosAdmin()">🔄 Atualizar Listas</button>
+    <button onclick="buscarDadosDoBanco()">🔄 Atualizar Listas</button>
     
-    <!-- TABELA DE CONVIDADOS -->
     <h2>Lista de Convidados e Presenças</h2>
     <table>
       <thead>
@@ -37,7 +36,6 @@
       </tbody>
     </table>
 
-    <!-- TABELA DE PRESENTES -->
     <h2>Lista de Presentes Escolhidos</h2>
     <table>
       <thead>
@@ -53,68 +51,68 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://jncjiqyakzztfgzldshi.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"; 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      global: { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } }
+    const URL_BANCO = "https://jncjiqyakzztfgzldshi.supabase.co";
+    const CHAVE_BANCO = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"; 
+    
+    const conexaoSupabase = supabase.createClient(URL_BANCO, CHAVE_BANCO, {
+      global: { headers: { apikey: CHAVE_BANCO, Authorization: `Bearer ${CHAVE_BANCO}` } }
     });
 
-    async function carregarDadosAdmin() {
-      // 1. LEITURA DE CONVIDADOS
-      const { data: convidados, error: errC } = await _supabase
+    async function buscarDadosDoBanco() {
+      // 1. BUSCAR CONVIDADOS
+      const { data: listaConvidados, error: erroC } = await conexaoSupabase
         .from('convidados')
         .select('*')
         .order('nome', { ascending: true });
 
-      const tbodyC = document.getElementById("tabelaConvidados");
-      tbodyC.innerHTML = "";
+      const corpoTabelaC = document.getElementById("tabelaConvidados");
+      corpoTabelaC.innerHTML = "";
 
-      if (errC) {
-        tbodyC.innerHTML = `<tr><td colspan="2">Erro: ${errC.message}</td></tr>`;
-      } else if (!convidados || convidados.length === 0) {
-        tbodyC.innerHTML = "<tr><td colspan="2">Nenhum convidado cadastrado.</td></tr>";
+      if (erroC) {
+        corpoTabelaC.innerHTML = `<tr><td colspan="2">Erro: ${erroC.message}</td></tr>`;
+      } else if (!listaConvidados || listaConvidados.length === 0) {
+        corpoTabelaC.innerHTML = "<tr><td colspan="2">Nenhum convidado cadastrado.</td></tr>";
       } else {
-        convidados.forEach(c => {
-          let statusText = "❌ Ainda não respondeu";
-          if (c.respondido === true || c.respondido === 'TRUE') {
-            statusText = c.resposta || "✅ Confirmado";
+        listaConvidados.forEach(item => {
+          let respostaTexto = "❌ Ainda não respondeu";
+          if (item.respondido === true || item.respondido === 'TRUE') {
+            respostaTexto = item.resposta || "✅ Confirmado";
           }
-          tbodyC.innerHTML += `<tr><td><strong>${c.nome}</strong></td><td>${statusText}</td></tr>`;
+          corpoTabelaC.innerHTML += `<tr><td><strong>${item.nome}</strong></td><td>${respostaTexto}</td></tr>`;
         });
       }
 
-      // 2. LEITURA DE PRESENTES (Lendo exatamente as colunas reais 'nome' e 'reservado_por')
-      const { data: presentes, error: errP } = await _supabase
+      // 2. BUSCAR PRESENTES
+      const { data: listaPresentes, error: erroP } = await conexaoSupabase
         .from('presentes')
         .select('*')
         .order('nome', { ascending: true });
 
-      const tbodyP = document.getElementById("tabelaPresentes");
-      tbodyP.innerHTML = "";
+      const corpoTabelaP = document.getElementById("tabelaPresentes");
+      corpoTabelaP.innerHTML = "";
 
-      if (errP) {
-        tbodyP.innerHTML = `<tr><td colspan="2">Erro: ${errP.message}</td></tr>`;
-      } else if (!presentes || presentes.length === 0) {
-        tbodyP.innerHTML = "<tr><td colspan="2">Nenhum presente cadastrado.</td></tr>";
+      if (erroP) {
+        corpoTabelaP.innerHTML = `<tr><td colspan="2">Erro: ${erroP.message}</td></tr>`;
+      } else if (!listaPresentes || listaPresentes.length === 0) {
+        corpoTabelaP.innerHTML = "<tr><td colspan="2">Nenhum presente cadastrado.</td></tr>";
       } else {
-        let encontrouPresente = false;
+        let temPresenteReservado = false;
         
-        presentes.forEach(p => {
-          // Se estiver marcado como reservado ou tiver um nome preenchido em 'reservado_por'
-          if (p.reservado === true || p.reservado === 'TRUE' || p.reservado_por) {
-            encontrouPresente = true;
-            tbodyP.innerHTML += `<tr><td>${p.nome}</td><td>🎁 ${p.reservado_por || 'Nome não informado'}</td></tr>`;
+        listaPresentes.forEach(produto => {
+          if (produto.reservado === true || produto.reservado === 'TRUE' || produto.reservado_por) {
+            temPresenteReservado = true;
+            corpoTabelaP.innerHTML += `<tr><td>${produto.nome}</td><td>🎁 ${produto.reservado_por || 'Nome não informado'}</td></tr>`;
           }
         });
 
-        if (!encontrouPresente) {
-          tbodyP.innerHTML = "<tr><td colspan="2">Nenhum presente reservado ainda.</td></tr>";
+        if (!temPresenteReservado) {
+          corpoTabelaP.innerHTML = "<tr><td colspan="2">Nenhum presente reservado ainda.</td></tr>";
         }
       }
     }
 
-    // Carrega os dados na tela ao abrir a página
-    carregarDadosAdmin();
+    // Executa a busca assim que o painel abre
+    buscarDadosDoBanco();
   </script>
 </body>
 </html>
