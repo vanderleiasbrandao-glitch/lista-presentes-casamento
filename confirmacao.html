@@ -98,7 +98,7 @@ return;
 const resposta=document.querySelector('input[name="resposta"]:checked').value;
 
 const {error}=await supabaseClient
-.from("convidados")
+.from("Convidados")
 .insert([{nome:nome,resposta:resposta}]);
 
 if(error){
