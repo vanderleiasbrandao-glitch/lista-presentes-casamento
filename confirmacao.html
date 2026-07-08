@@ -32,8 +32,8 @@
     </select>
 
     <div class="radio-group">
-      <label><input type="radio" name="presenca" value="sim" checked> Sim! Estarei lá com vocês ❤️</label>
-      <label><input type="radio" name="presenca" value="nao"> Não poderei ir, mas desejo toda a felicidade do mundo ✨</label>
+      <label><input type="radio" name="presenca" value="Sim! Estarei lá com vocês ❤️" checked> Sim! Estarei lá com vocês ❤️</label>
+      <label><input type="radio" name="presenca" value="Não poderei ir"> Não poderei ir, mas desejo toda a felicidade do mundo ✨</label>
     </div>
 
     <button onclick="enviarResposta()">Enviar Resposta</button>
@@ -45,10 +45,11 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function carregarListaPublica() {
+      // Busca quem tem a coluna 'resposta' vazia (NULL)
       const { data: lista, error } = await _supabase
         .from('Convidados')
         .select('*')
-        .is('confirmado', null)
+        .is('resposta', null)
         .order('nome', { ascending: true });
 
       if (error) {
@@ -75,18 +76,20 @@
 
     async function enviarResposta() {
       const idConvidado = document.getElementById("selectConvidados").value;
-      const respostaRadio = document.querySelector('input[name="presenca"]:checked').value;
+      const textoResposta = document.querySelector('input[name="presenca"]:checked').value;
 
       if (!idConvidado) {
         alert("Por favor, selecione o seu nome na lista antes de enviar.");
         return;
       }
 
-      const statusConfirmacao = (respostaRadio === "sim");
-
+      // Atualiza as colunas exatamente como estão no seu banco
       const { error } = await _supabase
         .from('Convidados')
-        .update({ confirmado: statusConfirmacao })
+        .update({ 
+          resposta: textoResposta,
+          respondido: true 
+        })
         .eq('id', idConvidado);
 
       if (error) {
