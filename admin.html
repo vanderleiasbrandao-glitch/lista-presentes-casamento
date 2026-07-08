@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Confirmações</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 20px; color: #333; }
+    h2 { color: #d46a92; text-align: center; }
+    .login-container, .lista-container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,.1); }
+    input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #d46a92; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #b55376; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background-color: #f9f9f9; color: #d46a92; }
+    .status-sim { color: green; font-weight: bold; }
+    .status-nao { color: red; font-weight: bold; }
+    .status-pendente { color: #777; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <!-- TELA DE LOGIN -->
+  <div id="loginSection" class="login-container">
+    <h2>Acesso Restrito</h2>
+    <p>Digite a senha para visualizar a lista completa:</p>
+    <input type="password" id="senhaInput" placeholder="Senha">
+    <button onclick="verificarSenha()">Entrar</button>
+  </div>
+
+  <!-- TELA DA LISTA -->
+  <div id="listaSection" class="lista-container" style="display: none;">
+    <h2>Lista de Convidados e Presenças</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Presença</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaCorpo">
+        <!-- Os nomes vão aparecer aqui -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://jncjiqyakzztfgzldshi.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuY2ppcXlha3p6dGZnemxkc2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU5NjQ2MzgsImV4cCI6MjAzMTU0MDYzOH0.6_f9pXn9Y_8_r4_z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z_Z"; 
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function verificarSenha() {
+      const senha = document.getElementById("senhaInput").value;
+      if (senha === "angelicaelucas") {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("listaSection").style.display = "block";
+        carregarListaCompleta();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
+
+    async function carregarListaCompleta() {
+      const { data: convidados, error } = await _supabase
+        .from('Convidados')
+        .select('*')
+        .order('nome', { ascending: true });
+
+      if (error) {
+        console.error("Erro ao carregar:", error);
+        return;
+      }
+
+      const tabela = document.getElementById("tabelaCorpo");
+      tabela.innerHTML = "";
+
+      convidados.forEach(c => {
+        const tr = document.createElement("tr");
+        
+        let statusTexto = '<span class="status-pendente">Ainda não respondeu</span>';
+        if (c.confirmado === true) {
+          statusTexto = '<span class="status-sim">Confirmou</span>';
+        } else if (c.confirmado === false) {
+          statusTexto = '<span class="status-nao">Não vai</span>';
+        }
+
+        tr.innerHTML = `<td>${c.nome}</td><td>${statusTexto}</td>`;
+        tabela.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
