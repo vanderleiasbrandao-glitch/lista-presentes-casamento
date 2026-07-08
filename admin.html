@@ -23,6 +23,7 @@
     <h1>Painel de Controle do Casamento</h1>
     <button onclick="carregarDadosAdmin()">🔄 Atualizar Listas</button>
     
+    <!-- TABELA DE CONVIDADOS -->
     <h2>Lista de Convidados e Presenças</h2>
     <table>
       <thead>
@@ -36,6 +37,7 @@
       </tbody>
     </table>
 
+    <!-- TABELA DE PRESENTES -->
     <h2>Lista de Presentes Escolhidos</h2>
     <table>
       <thead>
@@ -81,7 +83,7 @@
         });
       }
 
-      // 2. LEITURA DE PRESENTES
+      // 2. LEITURA DE PRESENTES (Lendo exatamente as colunas reais 'nome' e 'reservado_por')
       const { data: presentes, error: errP } = await _supabase
         .from('presentes')
         .select('*')
@@ -96,10 +98,12 @@
         tbodyP.innerHTML = "<tr><td colspan="2">Nenhum presente cadastrado.</td></tr>";
       } else {
         let encontrouPresente = false;
+        
         presentes.forEach(p => {
+          // Se estiver marcado como reservado ou tiver um nome preenchido em 'reservado_por'
           if (p.reservado === true || p.reservado === 'TRUE' || p.reservado_por) {
             encontrouPresente = true;
-            tbodyP.innerHTML += `<tr><td>${p.nome}</td><td>🎁 ${p.reservado_por || 'Anônimo'}</td></tr>`;
+            tbodyP.innerHTML += `<tr><td>${p.nome}</td><td>🎁 ${p.reservado_por || 'Nome não informado'}</td></tr>`;
           }
         });
 
@@ -109,6 +113,7 @@
       }
     }
 
+    // Carrega os dados na tela ao abrir a página
     carregarDadosAdmin();
   </script>
 </body>
