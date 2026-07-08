@@ -41,17 +41,27 @@
 
   <script>
     const SUPABASE_URL = "https://jncjiqyakzztfgzldshi.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"; 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ATT: Substitua o texto abaixo pela sua chave sb_publishable_ que você copiou
+    const SUPABASE_KEY = "COLE_AQUI_SUA_CHAVE_SB_PUBLISHABLE"; 
+
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    });
 
     async function carregarListaPublica() {
+      // Puxa os dados da tabela exatamente como está criada (Convidados)
       const { data: lista, error } = await _supabase
         .from('Convidados')
         .select('*')
         .order('nome', { ascending: true });
 
       if (error) {
-        console.error("Erro ao carregar:", error);
+        console.error("Erro Supabase:", error);
         document.getElementById("selectConvidados").innerHTML = '<option value="">Erro ao carregar lista</option>';
         return;
       }
@@ -60,7 +70,7 @@
       select.innerHTML = '<option value="">-- Clique aqui para escolher seu nome --</option>';
 
       if (!lista || lista.length === 0) {
-        select.innerHTML = '<option value="">Nenhum convidado cadastrado!</option>';
+        select.innerHTML = '<option value="">Nenhum convidado localizado no banco.</option>';
         return;
       }
 
