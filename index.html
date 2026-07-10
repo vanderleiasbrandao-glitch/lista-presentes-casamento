@@ -31,8 +31,7 @@
   </header>
 
   <div class="grid-presentes" id="listaProdutos">
-    <!-- Os produtos serão carregados aqui via JavaScript -->
-  </div>
+    </div>
 
   <script>
     const SUPABASE_URL = "https://jncjiqyakzztfgzldshi.supabase.co";
@@ -84,11 +83,12 @@
           acaoBotao = `<div class="status-reservado">❤️ Já Escolhido</div>`;
         }
 
+        // Alinhamento inteligente: só cria a tag de descrição se houver texto nela
         card.innerHTML = `
           <div>
             <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
             <div class="nome-presente">${p.nome}</div>
-            <div class="descricao-presente">${dadosDescricao.texto || 'Sem descrição.'}</div>
+            ${dadosDescricao.texto ? `<div class="descricao-presente">${dadosDescricao.texto}</div>` : ''}
             ${botaoLinkLoja}
             <div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>
           </div>
