@@ -8,10 +8,10 @@
 <style>
 body{
     font-family:Arial,sans-serif;
-    background:#fdfaf7; /* Fundo suave da paleta */
+    background:#fdfaf7;
     margin:0;
     padding:15px;
-    color:#4a3b32; /* Texto escuro elegante */
+    color:#4a3b32;
 }
 .container{
     max-width:1000px;
@@ -22,40 +22,33 @@ body{
     box-shadow:0 0 10px rgba(74,59,50,.1);
     border: 1px solid #f3ebe4;
 }
-
-/* Ajuste nos títulos para caberem em uma única linha no celular */
 h1, h2{
-    color:#c26d4c; /* Títulos em Terracota */
+    color:#c26d4c;
     text-align:center;
     margin-left: auto;
     margin-right: auto;
-    white-space: nowrap; /* Impede a quebra de linha */
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 h1 {
-    font-size: 20px; /* Tamanho calibrado para telas pequenas */
+    font-size: 20px;
     margin-top: 10px;
     margin-bottom: 5px;
 }
-
 h2 {
-    font-size: 18px; /* Tamanho calibrado para telas pequenas */
+    font-size: 18px;
     margin-top: 30px;
     margin-bottom: 15px;
 }
-
-/* Ajustes finos adicionais para telas maiores (computador) */
 @media (min-width: 600px) {
     h1 { font-size: 28px; }
     h2 { font-size: 24px; }
     body { padding: 20px; }
     .container { padding: 25px; }
 }
-
 button{
-    background:#c26d4c; /* Botão em Terracota */
+    background:#c26d4c;
     color:white;
     border:none;
     padding:12px 25px;
@@ -67,7 +60,7 @@ button{
     transition:background 0.3s;
 }
 button:hover{
-    background:#a45334; /* Terracota mais escuro no hover */
+    background:#a45334;
 }
 table{
     width:100%;
@@ -76,17 +69,16 @@ table{
     margin-bottom:40px;
 }
 th,td{
-    border:1px solid #eacfbf; /* Bordas suaves combinando */
+    border:1px solid #eacfbf;
     padding:10px;
 }
 th{
-    background:#c26d4c; /* Cabeçalho da tabela em Terracota */
+    background:#c26d4c;
     color:white;
 }
 tr:nth-child(even){
-    background:#fdfaf7; /* Linhas alternadas no tom da paleta */
+    background:#fdfaf7;
 }
-/* Estilo para a coluna de numeração ficar centralizada e discreta */
 .col-num {
     text-align: center;
     width: 50px;
@@ -131,7 +123,6 @@ tr:nth-child(even){
 </div>
 
 <script>
-// Inicialização corrigida e direta do cliente Supabase
 const supabaseClient = supabase.createClient(
     "https://jncjiqyakzztfgzldshi.supabase.co",
     "sb_publishable_eoGZmq-_cRw0DFr2UY-dig_ZoR4tUnB"
@@ -157,11 +148,9 @@ async function carregarConvidados(){
         return;
     }
 
-    // Adicionado índice (i) para fazer a contagem sequencial automática
     data.forEach((c, i) => {
         let resposta = "❌ Ainda não respondeu";
         
-        // Ajuste para reconhecer tanto o valor lógico quanto o texto 'TRUE' do seu banco
         if (c.respondido === true || c.respondido === 'TRUE') {
             resposta = c.resposta || "✅ Confirmado";
         }
@@ -196,7 +185,6 @@ async function carregarPresentes(){
 
     if (data) {
         data.forEach(p => {
-            // Ajuste para validar corretamente se o item está reservado
             if (p.reservado === true || p.reservado === 'TRUE' || p.reservado_por) {
                 encontrou = true;
                 tabela.innerHTML += `
@@ -206,7 +194,7 @@ async function carregarPresentes(){
                         <td>🎁 ${p.reservado_por || "-"}</td>
                     </tr>
                 `;
-                contadorPresentes++; // Aumenta o número para o próximo presente reservado
+                contadorPresentes++;
             }
         });
     }
@@ -221,7 +209,6 @@ async function carregarTudo(){
     await carregarPresentes();
 }
 
-// Executa automaticamente ao abrir a tela
 carregarTudo();
 </script>
 
