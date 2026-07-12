@@ -13,13 +13,22 @@
     
     /* Seção horizontal para os itens já escolhidos */
     .secao-escolhidos { max-width: 1200px; margin: 0 auto 40px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(74, 59, 50, 0.05); border: 1px solid #eacfbf; }
-    .titulo-escolhidos { font-size: 20px; font-family: 'Georgia', serif; color: #c26d4c; margin: 0 0 15px 0; text-align: left; font-weight: bold; }
-    .carrossel-escolhidos { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; }
-    .carrossel-escolhidos::-webkit-scrollbar { height: 8px; }
+    .titulo-escolhidos { font-size: 18px; font-family: 'Georgia', serif; color: #c26d4c; margin: 0 0 15px 0; text-align: left; font-weight: bold; }
+    
+    /* Configuração do Carrossel em Miniatura para Celular */
+    .carrossel-escolhidos { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    .carrossel-escolhidos::-webkit-scrollbar { height: 6px; }
     .carrossel-escolhidos::-webkit-scrollbar-thumb { background: #eacfbf; border-radius: 4px; }
-    .carrossel-escolhidos .card-presente { min-width: 250px; max-width: 250px; }
-    .carrossel-escolhidos .card-presente img { height: 130px; }
+    
+    /* Tamanho miniatura dos cards no carrossel */
+    .carrossel-escolhidos .card-presente { min-width: 180px; max-width: 180px; padding: 12px; }
+    .carrossel-escolhidos .card-presente img { height: 100px; margin-bottom: 8px; }
+    .carrossel-escolhidos .nome-presente { font-size: 14px; margin: 5px 0; }
+    .carrossel-escolhidos .valor-presente { font-size: 16px; margin: 8px 0; }
+    .carrossel-escolhidos .status-reservado { font-size: 12px; padding: 8px; }
+    .carrossel-escolhidos .btn-link-loja { font-size: 11px; padding: 5px; }
 
+    /* Grade vertical dos disponíveis */
     .grid-presentes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
     .card-presente { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(74, 59, 50, 0.05); text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #f3ebe4; }
     .card-presente img { max-width: 100%; height: 180px; object-fit: contain; border-radius: 5px; margin-bottom: 15px; }
@@ -119,7 +128,6 @@
           ${acaoBotao}
         `;
 
-        // Se estiver reservado, vai para o carrossel superior horizontal, senão fica na lista vertical
         if (isReservado) {
           containerEscolhidos.appendChild(card);
           temEscolhido = true;
@@ -128,7 +136,6 @@
         }
       });
 
-      // Só mostra o bloco horizontal se tiver pelo menos um item já escolhido
       if (temEscolhido) {
         divSecaoEscolhidos.style.display = "block";
       } else {
