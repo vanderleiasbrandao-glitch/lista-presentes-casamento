@@ -24,7 +24,6 @@
     .carrossel-escolhidos .card-presente { min-width: 180px; max-width: 180px; padding: 12px; }
     .carrossel-escolhidos .card-presente img { height: 100px; margin-bottom: 8px; }
     .carrossel-escolhidos .nome-presente { font-size: 14px; margin: 5px 0; }
-    .carrossel-escolhidos .valor-presente { font-size: 16px; margin: 8px 0; }
     .carrossel-escolhidos .status-reservado { font-size: 12px; padding: 8px; }
     .carrossel-escolhidos .btn-link-loja { font-size: 11px; padding: 5px; }
 
@@ -117,13 +116,16 @@
           acaoBotao = `<div class="status-reservado">❤️ Já Escolhido</div>`;
         }
 
+        // Esconde o preço se o item já foi reservado
+        const tagPreco = isReservado ? '' : `<div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>`;
+
         card.innerHTML = `
           <div>
             <img src="${p.imagem || 'https://via.placeholder.com/150'}" alt="${p.nome}">
             <div class="nome-presente">${p.nome}</div>
             ${dadosDescricao.texto ? `<div class="descricao-presente">${dadosDescricao.texto}</div>` : ''}
             ${botaoLinkLoja}
-            <div class="valor-presente">R$ ${Number(p.valor).toFixed(2).replace('.', ',')}</div>
+            ${tagPreco}
           </div>
           ${acaoBotao}
         `;
